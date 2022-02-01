@@ -28,7 +28,7 @@ func main() {
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	hostname := getMetadata("hostname")
+	hostname := getMetadata("/hostname")
 	fmt.Fprintf(w, "%s\n", hostname)
 }
 
