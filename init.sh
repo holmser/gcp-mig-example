@@ -9,5 +9,3 @@ sudo apt-get -y install python-pip3
 # Install Python requirements
 pip3 install -r requirements.txt
 
-
-

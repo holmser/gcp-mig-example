@@ -1,4 +1,5 @@
 from flask import Flask
+from waitress import serve
 import requests
 
 app = Flask(__name__)
@@ -25,3 +26,6 @@ def get_info(subpath):
     url += subpath
     r = requests.get(url, headers=headers)
     return(r.text)
+
+if __name__ == "__main__":
+    serve(app, host='0.0.0.0', port=8080)
