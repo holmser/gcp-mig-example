@@ -7,8 +7,15 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
+
+	"cloud.google.com/go/compute/metadata"
 )
+
+// type Metadata struct {
+// 	HostName    string
+// 	AZ          string
+// 	MachineType string
+// }
 
 func main() {
 	log.Print("starting server...")
@@ -21,21 +28,36 @@ func main() {
 		log.Printf("defaulting to port %s", port)
 	}
 
-	// Start HTTP server.
-	log.Printf("listening on port %s", port)
-	if err := http.ListenAndServe(":"+port, nil); err != nil {
-		log.Fatal(err)
+	c := metadata.NewClient(&http.Client{})
+	p, err := c.ProjectID()
+	if err != nil {
+		fmt.Println(err)
 	}
+	fmt.Println(p)
+	// Start HTTP server.
+	// log.Printf("listening on port %s", port)
+	// if err := http.ListenAndServe(":"+port, nil); err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// metadata := Metadata{HostName: string(getMetadata("/hostname"))}
+	// fmt.Println(metadata)
+	// hostname := getMetadata("/hostname")
+	// zone := strings.SplitAfter(string(getMetadata("/zone")), "/")
+	// zoneText := zone[len(zone)-1]
+	// machineType := strings.SplitAfter(string(getMetadata("/machine-type")), "/")
+	// machineTypeText := machineType[len(machineType)-1]
+
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	hostname := getMetadata("/hostname")
-	zone := strings.SplitAfter(string(getMetadata("/zone")), "/")
-	zoneText := zone[len(zone)-1]
-	machineType := strings.SplitAfter(string(getMetadata("/machine-type")), "/")
-	machineTypeText := machineType[len(machineType)-1]
+	// hostname := getMetadata("/hostname")
+	// zone := strings.SplitAfter(string(getMetadata("/zone")), "/")
+	// zoneText := zone[len(zone)-1]
+	// machineType := strings.SplitAfter(string(getMetadata("/machine-type")), "/")
+	// machineTypeText := machineType[len(machineType)-1]
 
-	fmt.Fprintf(w, "hostname: %s\nzone: %s\nmachineType: %s\n", hostname, zoneText, machineTypeText)
+	// fmt.Fprintf(w, "hostname: %s\nzone: %s\nmachineType: %s\n", hostname, zoneText, machineTypeText)
 }
 
 func getMetadata(path string) []byte {
