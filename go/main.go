@@ -3,19 +3,19 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"cloud.google.com/go/compute/metadata"
 )
 
-// type Metadata struct {
-// 	HostName    string
-// 	AZ          string
-// 	MachineType string
-// }
+type InstanceMetadata struct {
+	HostName    string
+	AZ          string
+	MachineType string
+}
 
 func main() {
 	log.Print("starting server...")
@@ -28,12 +28,9 @@ func main() {
 		log.Printf("defaulting to port %s", port)
 	}
 
-	c := metadata.NewClient(&http.Client{})
-	p, err := c.ProjectID()
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(p)
+	data := getMetadata()
+	fmt.Println(*data)
+	// fmt.Println(p)
 	// Start HTTP server.
 	// log.Printf("listening on port %s", port)
 	// if err := http.ListenAndServe(":"+port, nil); err != nil {
@@ -60,22 +57,27 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	// fmt.Fprintf(w, "hostname: %s\nzone: %s\nmachineType: %s\n", hostname, zoneText, machineTypeText)
 }
 
-func getMetadata(path string) []byte {
-	client := &http.Client{}
-	url := "http://metadata.google.internal/computeMetadata/v1/instance" + path
-	req, err := http.NewRequest("GET", url, nil)
+func getMetadata() *InstanceMetadata {
 
-	req.Header.Add("Metadata-flavor", "Google")
-	resp, err := client.Do(req)
-	// check for response error
+	c := metadata.NewClient(&http.Client{})
+	hostname, err := c.Hostname()
 	if err != nil {
 		log.Fatal(err)
 	}
-	// read response body
-	data, _ := ioutil.ReadAll(resp.Body)
+	zone, err := c.Zone()
+	if err != nil {
+		log.Fatal(err)
+	}
+	machineType, err := c.Get("instance/machine-type")
+	if err != nil {
+		log.Fatal(err)
+	}
+	machineTypeText := strings.SplitAfter(string(machineType), "/")
 
-	// close response body
-	resp.Body.Close()
+	return &InstanceMetadata{
+		HostName:    hostname,
+		AZ:          zone,
+		MachineType: machineTypeText[len(machineTypeText)-1],
+	}
 
-	return data
 }
