@@ -29,7 +29,10 @@ func main() {
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	hostname := getMetadata("/hostname")
-	fmt.Fprintf(w, "%s\n", hostname)
+	zone := getMetadata("/zone")
+	machineType := getMetadata("/machine-type")
+
+	fmt.Fprintf(w, "hostname: %s\nzone: %s\nmachineType: %s\n", hostname, zone, machineType)
 }
 
 func getMetadata(path string) []byte {
