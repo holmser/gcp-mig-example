@@ -28,14 +28,14 @@ func main() {
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	hostname := getMetadata()
+	hostname := getMetadata("hostname")
 	fmt.Fprintf(w, "%s\n", hostname)
 }
 
-func getMetadata() []byte {
+func getMetadata(path string) []byte {
 	client := &http.Client{}
-
-	req, err := http.NewRequest("GET", "http://metadata.google.internal/computeMetadata/v1/instance/hostname", nil)
+	url := "http://metadata.google.internal/computeMetadata/v1/instance" + path
+	req, err := http.NewRequest("GET", url, nil)
 
 	req.Header.Add("Metadata-flavor", "Google")
 	resp, err := client.Do(req)
