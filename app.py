@@ -14,7 +14,7 @@ def get_default():
         info = subpath.split("/")[1]
         new_url = url + subpath
         r = requests.get(new_url, headers=headers)
-        return_text += (info + ": " r.text + "\n")
+        return_text += (info + ": " + r.text + "\n")
     return(return_text)
 
 
