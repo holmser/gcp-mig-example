@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -29,10 +30,12 @@ func main() {
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	hostname := getMetadata("/hostname")
-	zone := getMetadata("/zone")
-	machineType := getMetadata("/machine-type")
+	zone := strings.SplitAfter(string(getMetadata("/zone")), "/")
+	zoneText := zone[len(zone)-1]
+	machineType := strings.SplitAfter(string(getMetadata("/machine-type")), "/")
+	machineTypeText := machineType[len(machineType)-1]
 
-	fmt.Fprintf(w, "hostname: %s\nzone: %s\nmachineType: %s\n", hostname, zone, machineType)
+	fmt.Fprintf(w, "hostname: %s\nzone: %s\nmachineType: %s\n", hostname, zoneText, machineTypeText)
 }
 
 func getMetadata(path string) []byte {
