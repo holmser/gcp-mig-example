@@ -12,14 +12,17 @@ import (
 )
 
 type InstanceMetadata struct {
-	HostName    string
-	AZ          string
-	MachineType string
+	hostname    string
+	zone        string
+	machinetype string
 }
 
 func main() {
+	// only pull traits once
+	data := getMetadata()
+
 	log.Print("starting server...")
-	http.HandleFunc("/", handler)
+	http.HandleFunc("/", data.handler)
 
 	// Determine port for HTTP service.
 	port := os.Getenv("PORT")
@@ -28,37 +31,19 @@ func main() {
 		log.Printf("defaulting to port %s", port)
 	}
 
-	data := getMetadata()
-	fmt.Println(*data)
-	// fmt.Println(p)
 	// Start HTTP server.
-	// log.Printf("listening on port %s", port)
-	// if err := http.ListenAndServe(":"+port, nil); err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// metadata := Metadata{HostName: string(getMetadata("/hostname"))}
-	// fmt.Println(metadata)
-	// hostname := getMetadata("/hostname")
-	// zone := strings.SplitAfter(string(getMetadata("/zone")), "/")
-	// zoneText := zone[len(zone)-1]
-	// machineType := strings.SplitAfter(string(getMetadata("/machine-type")), "/")
-	// machineTypeText := machineType[len(machineType)-1]
-
+	log.Printf("listening on port %s", port)
+	if err := http.ListenAndServe(":"+port, nil); err != nil {
+		log.Fatal(err)
+	}
 }
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	// hostname := getMetadata("/hostname")
-	// zone := strings.SplitAfter(string(getMetadata("/zone")), "/")
-	// zoneText := zone[len(zone)-1]
-	// machineType := strings.SplitAfter(string(getMetadata("/machine-type")), "/")
-	// machineTypeText := machineType[len(machineType)-1]
-
-	// fmt.Fprintf(w, "hostname: %s\nzone: %s\nmachineType: %s\n", hostname, zoneText, machineTypeText)
+func (data InstanceMetadata) handler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "hostname: %s\nzone: %s\nmachineType: %s\n", data.hostname, data.zone, data.machinetype)
 }
 
 func getMetadata() *InstanceMetadata {
-
+	// Use GCP SDK to pull metadata
 	c := metadata.NewClient(&http.Client{})
 	hostname, err := c.Hostname()
 	if err != nil {
@@ -75,9 +60,9 @@ func getMetadata() *InstanceMetadata {
 	machineTypeText := strings.SplitAfter(string(machineType), "/")
 
 	return &InstanceMetadata{
-		HostName:    hostname,
-		AZ:          zone,
-		MachineType: machineTypeText[len(machineTypeText)-1],
+		hostname:    hostname,
+		zone:        zone,
+		machinetype: machineTypeText[len(machineTypeText)-1],
 	}
 
 }
