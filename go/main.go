@@ -2,13 +2,17 @@
 package main
 
 import (
-	"fmt"
+	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"strings"
 )
+
+struct MigTemplate {
+	
+}
 
 func main() {
 	log.Print("starting server...")
@@ -17,7 +21,7 @@ func main() {
 	// Determine port for HTTP service.
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080"
+		port = "8081"
 		log.Printf("defaulting to port %s", port)
 	}
 
@@ -34,8 +38,19 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	zoneText := zone[len(zone)-1]
 	machineType := strings.SplitAfter(string(getMetadata("/machine-type")), "/")
 	machineTypeText := machineType[len(machineType)-1]
+	// fmt.Fprintf(w, "hostname: %s\nzone: %s\nmachineType: %s\n", hostname, zoneText, machineTypeText)
+	tmpl := template.Must(template.ParseFiles("static/index.html"))
+	data := struct {
+		HostName    string
+		AZ          string
+		MachineType string
+	}{
+		HostName:    string(hostname),
+		AZ:          zoneText,
+		MachineType: machineTypeText,
+	}
+	tmpl.Execute(w, data)
 
-	fmt.Fprintf(w, "hostname: %s\nzone: %s\nmachineType: %s\n", hostname, zoneText, machineTypeText)
 }
 
 func getMetadata(path string) []byte {
