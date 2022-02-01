@@ -1,4 +1,4 @@
-// Example GCP server that responds with meta data of the server
+// Example GCP server that responds with metadata
 package main
 
 import (
