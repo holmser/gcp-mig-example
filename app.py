@@ -11,7 +11,7 @@ def get_default():
     default_info = ['/instance/hostname', '/instance/machine-type', '/instance/zone']
     return_text = ''
     for subpath in default_info:
-        info = subpath.split("/")[3]
+        info = subpath.split("/")[2]
         new_url = url + subpath
         r = requests.get(new_url, headers=headers)
         return_text += (info + ": " + r.text + "\n")
