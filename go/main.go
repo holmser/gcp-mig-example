@@ -2,19 +2,19 @@
 package main
 
 import (
+	"cloud.google.com/go/compute/metadata"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
 	"strings"
-
-	"cloud.google.com/go/compute/metadata"
 )
 
 type InstanceMetadata struct {
-	hostname    string
-	zone        string
-	machinetype string
+	Hostname    string
+	Zone        string
+	Machinetype string
 }
 
 func main() {
@@ -39,7 +39,10 @@ func main() {
 }
 
 func (data InstanceMetadata) handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "hostname: %s\nzone: %s\nmachineType: %s\n", data.hostname, data.zone, data.machinetype)
+	tmpl := template.Must(template.ParseFiles("/app/static/index.html"))
+	// log.Println(tmpl)
+	tmpl.Execute(w, data)
+	// fmt.Fprintf(w, "hostname: %s\nzone: %s\nmachineType: %s\n", data.hostname, data.zone, data.machinetype)
 }
 
 func getMetadata() *InstanceMetadata {
@@ -58,11 +61,10 @@ func getMetadata() *InstanceMetadata {
 		machineType = "none"
 	}
 	machineTypeText := strings.SplitAfter(string(machineType), "/")
-
+	fmt.Println(hostname, zone, machineType)
 	return &InstanceMetadata{
-		hostname:    hostname,
-		zone:        zone,
-		machinetype: machineTypeText[len(machineTypeText)-1],
+		Hostname:    hostname,
+		Zone:        zone,
+		Machinetype: machineTypeText[len(machineTypeText)-1],
 	}
-
 }
