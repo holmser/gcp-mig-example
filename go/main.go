@@ -39,10 +39,9 @@ func main() {
 }
 
 func (data InstanceMetadata) handler(w http.ResponseWriter, r *http.Request) {
+	// Load template and populate it
 	tmpl := template.Must(template.ParseFiles("/app/static/index.html"))
-	// log.Println(tmpl)
 	tmpl.Execute(w, data)
-	// fmt.Fprintf(w, "hostname: %s\nzone: %s\nmachineType: %s\n", data.hostname, data.zone, data.machinetype)
 }
 
 func getMetadata() *InstanceMetadata {
@@ -61,7 +60,7 @@ func getMetadata() *InstanceMetadata {
 		machineType = "none"
 	}
 	machineTypeText := strings.SplitAfter(string(machineType), "/")
-	fmt.Println(hostname, zone, machineType)
+
 	return &InstanceMetadata{
 		Hostname:    hostname,
 		Zone:        zone,
