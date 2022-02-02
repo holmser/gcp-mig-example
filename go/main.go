@@ -47,15 +47,15 @@ func getMetadata() *InstanceMetadata {
 	c := metadata.NewClient(&http.Client{})
 	hostname, err := c.Hostname()
 	if err != nil {
-		log.Fatal(err)
+		hostname = "none"
 	}
 	zone, err := c.Zone()
 	if err != nil {
-		log.Fatal(err)
+		zone = "none"
 	}
 	machineType, err := c.Get("instance/machine-type")
 	if err != nil {
-		log.Fatal(err)
+		machineType = "none"
 	}
 	machineTypeText := strings.SplitAfter(string(machineType), "/")
 
