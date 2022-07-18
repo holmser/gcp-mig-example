@@ -3,7 +3,6 @@ package main
 
 import (
 	"cloud.google.com/go/compute/metadata"
-	"fmt"
 	"html/template"
 	"log"
 	"net/http"
